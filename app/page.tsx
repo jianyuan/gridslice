@@ -3,7 +3,7 @@ import { Header } from "@/components/header";
 
 export default function Home() {
   return (
-    <div className="flex flex-col gap-8 px-4 py-8 sm:py-12">
+    <div className="flex flex-col gap-8 p-4 sm:p-8">
       <Header />
       <GridMaker />
     </div>
