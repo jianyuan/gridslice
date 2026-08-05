@@ -1,9 +1,9 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
-  output: "export",
+  output: 'export',
   basePath: process.env.PAGES_BASE_PATH,
   reactCompiler: true,
-};
+}
 
-export default nextConfig;
+export default nextConfig

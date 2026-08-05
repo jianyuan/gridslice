@@ -1,7 +1,6 @@
-"use client";
+'use client'
 
-import { useRef, useState } from "react";
-import { SpecCard } from "./spec-card";
+import JSZip from 'jszip'
 import {
   CropIcon,
   Download,
@@ -9,90 +8,89 @@ import {
   RotateCcw,
   Upload,
   ZoomIn,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import Cropper, { Area } from "react-easy-crop";
-import {
-  GeneratedTile,
-  generateTiles,
-  getTileGeometry,
-  overallCropAspect,
-  PixelCrop,
-} from "@/lib/grid";
-import JSZip from "jszip";
-import { Button } from "./ui/button";
+} from 'lucide-react'
+import { useRef, useState } from 'react'
+import type { Area } from 'react-easy-crop'
+import Cropper from 'react-easy-crop'
 
-const COLUMN_OPTIONS = [2, 3, 4] as const;
-const ROW_OPTIONS = [1, 2, 3] as const;
+import type { GeneratedTile, PixelCrop } from '@/lib/grid'
+import { generateTiles, getTileGeometry, overallCropAspect } from '@/lib/grid'
+import { cn } from '@/lib/utils'
+
+import { SpecCard } from './spec-card'
+import { Button } from './ui/button'
+
+const COLUMN_OPTIONS = [2, 3, 4] as const
+const ROW_OPTIONS = [1, 2, 3] as const
 
 const MARGIN_SWATCHES = [
-  { label: "White", value: "#ffffff" },
-  { label: "Black", value: "#000000" },
-  { label: "Cream", value: "#f5f0e8" },
-  { label: "Stone", value: "#e7e5e4" },
-];
+  { label: 'White', value: '#ffffff' },
+  { label: 'Black', value: '#000000' },
+  { label: 'Cream', value: '#f5f0e8' },
+  { label: 'Stone', value: '#e7e5e4' },
+]
 
 export function GridMaker() {
-  const [imageSrc, setImageSrc] = useState<string | null>(null);
-  const [columns, setColumns] = useState(3);
-  const [rows, setRows] = useState(1);
-  const [marginColor, setMarginColor] = useState("#ffffff");
+  const [imageSrc, setImageSrc] = useState<string | null>(null)
+  const [columns, setColumns] = useState(3)
+  const [rows, setRows] = useState(1)
+  const [marginColor, setMarginColor] = useState('#ffffff')
 
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
+  const [crop, setCrop] = useState({ x: 0, y: 0 })
+  const [zoom, setZoom] = useState(1)
   const [cropSize, setCropSize] = useState<{
-    width: number;
-    height: number;
-  } | null>(null);
-  const [pixelCrop, setPixelCrop] = useState<PixelCrop | null>(null);
+    width: number
+    height: number
+  } | null>(null)
+  const [pixelCrop, setPixelCrop] = useState<PixelCrop | null>(null)
 
-  const [tiles, setTiles] = useState<GeneratedTile[] | null>(null);
-  const [busy, setBusy] = useState(false);
-  const [dragging, setDragging] = useState(false);
+  const [tiles, setTiles] = useState<GeneratedTile[] | null>(null)
+  const [busy, setBusy] = useState(false)
+  const [dragging, setDragging] = useState(false)
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const aspect = overallCropAspect(columns, rows);
-  const geo = getTileGeometry();
+  const aspect = overallCropAspect(columns, rows)
+  const geo = getTileGeometry()
 
   const handleCropComplete = (_area: Area, areaPixels: Area) => {
-    setPixelCrop(areaPixels);
-  };
+    setPixelCrop(areaPixels)
+  }
 
   const loadFile = (file: File) => {
-    if (!file.type.startsWith("image/")) {
-      return;
+    if (!file.type.startsWith('image/')) {
+      return
     }
 
-    const reader = new FileReader();
+    const reader = new FileReader()
     reader.onload = () => {
-      setImageSrc(reader.result as string);
-      setTiles(null);
-      setZoom(1);
-      setCrop({ x: 0, y: 0 });
-    };
-    reader.readAsDataURL(file);
-  };
+      setImageSrc(reader.result as string)
+      setTiles(null)
+      setZoom(1)
+      setCrop({ x: 0, y: 0 })
+    }
+    reader.readAsDataURL(file)
+  }
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+    const file = e.target.files?.[0]
     if (file) {
-      loadFile(file);
+      loadFile(file)
     }
-  };
+  }
 
   const onDrop = (e: React.DragEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    setDragging(false);
-    const file = e.dataTransfer.files?.[0];
+    e.preventDefault()
+    setDragging(false)
+    const file = e.dataTransfer.files?.[0]
     if (file) {
-      loadFile(file);
+      loadFile(file)
     }
-  };
+  }
 
   const handleGenerate = async () => {
-    if (!imageSrc || !pixelCrop) return;
-    setBusy(true);
+    if (!imageSrc || !pixelCrop) return
+    setBusy(true)
     try {
       const result = await generateTiles({
         imageSrc,
@@ -100,48 +98,48 @@ export function GridMaker() {
         columns,
         rows,
         marginColor,
-      });
-      setTiles(result);
+      })
+      setTiles(result)
     } finally {
-      setBusy(false);
+      setBusy(false)
     }
-  };
+  }
 
   const downloadTile = (url: string, index: number) => {
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `grid-tile-${String(index + 1).padStart(2, "0")}.png`;
-    a.click();
-  };
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `grid-tile-${String(index + 1).padStart(2, '0')}.png`
+    a.click()
+  }
 
   const downloadAll = async () => {
-    if (!tiles) return;
-    const zip = new JSZip();
+    if (!tiles) return
+    const zip = new JSZip()
     tiles.forEach((tile, i) => {
-      const base64 = tile.uploadUrl.split(",")[1];
-      zip.file(`grid-tile-${String(i + 1).padStart(2, "0")}.png`, base64, {
+      const base64 = tile.uploadUrl.split(',')[1]
+      zip.file(`grid-tile-${String(i + 1).padStart(2, '0')}.png`, base64, {
         base64: true,
-      });
-    });
-    const blob = await zip.generateAsync({ type: "blob" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `instagram-grid-${rows}x${columns}.zip`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
+      })
+    })
+    const blob = await zip.generateAsync({ type: 'blob' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `instagram-grid-${rows}x${columns}.zip`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
 
   const reset = () => {
-    setImageSrc(null);
-    setTiles(null);
-    setPixelCrop(null);
-    setZoom(1);
-    setCrop({ x: 0, y: 0 });
+    setImageSrc(null)
+    setTiles(null)
+    setPixelCrop(null)
+    setZoom(1)
+    setCrop({ x: 0, y: 0 })
     if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+      fileInputRef.current.value = ''
     }
-  };
+  }
 
   return (
     <div className="flex flex-col gap-8">
@@ -158,16 +156,16 @@ export function GridMaker() {
           type="button"
           onClick={() => fileInputRef.current?.click()}
           onDragOver={(e) => {
-            e.preventDefault();
-            setDragging(true);
+            e.preventDefault()
+            setDragging(true)
           }}
           onDragLeave={() => {
-            setDragging(false);
+            setDragging(false)
           }}
           onDrop={onDrop}
           className={cn(
-            "flex w-full flex-col items-center justify-center gap-4 rounded-3xl border-2 border-dashed border-border bg-card px-6 py-20 text-center transition-colors hover:bg-muted/50",
-            dragging && "border-primary bg-accent",
+            'flex w-full flex-col items-center justify-center gap-4 rounded-3xl border-2 border-dashed border-border bg-card px-6 py-20 text-center transition-colors hover:bg-muted/50',
+            dragging && 'border-primary bg-accent',
           )}
         >
           <span className="flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
@@ -176,7 +174,7 @@ export function GridMaker() {
           <span className="text-lg font-medium text-card-foreground">
             Drop a photo here, or click to upload
           </span>
-          <span className="max-w-md text-pretty text-sm text-muted-foreground">
+          <span className="max-w-md text-sm text-pretty text-muted-foreground">
             Everything runs locally in your browser. Your image never leaves
             your device.
           </span>
@@ -204,7 +202,7 @@ export function GridMaker() {
               {/* Split guides */}
               {cropSize && (
                 <div
-                  className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+                  className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
                   style={{ width: cropSize.width, height: cropSize.height }}
                 >
                   <div className="absolute inset-0 flex">
@@ -245,10 +243,10 @@ export function GridMaker() {
 
             <p className="flex items-center gap-2 text-sm text-muted-foreground">
               <CropIcon className="size-4 shrink-0" />
-              Frame your shot inside the {rows}×{columns} guides: a{" "}
+              Frame your shot inside the {rows}×{columns} guides: a{' '}
               <span className="font-medium text-foreground">
                 {columns * 3}:{rows * 4}
-              </span>{" "}
+              </span>{' '}
               crop split into {rows * columns} posts.
             </p>
           </div>
@@ -256,18 +254,18 @@ export function GridMaker() {
           <Controls
             columns={columns}
             setColumns={(c) => {
-              setColumns(c);
-              setTiles(null);
+              setColumns(c)
+              setTiles(null)
             }}
             rows={rows}
             setRows={(r) => {
-              setRows(r);
-              setTiles(null);
+              setRows(r)
+              setTiles(null)
             }}
             marginColor={marginColor}
             setMarginColor={(c) => {
-              setMarginColor(c);
-              setTiles(null);
+              setMarginColor(c)
+              setTiles(null)
             }}
             onGenerate={handleGenerate}
             onReset={reset}
@@ -293,7 +291,7 @@ export function GridMaker() {
         marginPct={geo.marginPct}
       />
     </div>
-  );
+  )
 }
 
 function Controls({
@@ -307,15 +305,15 @@ function Controls({
   onReset,
   busy,
 }: {
-  columns: number;
-  setColumns: (c: number) => void;
-  rows: number;
-  setRows: (r: number) => void;
-  marginColor: string;
-  setMarginColor: (c: string) => void;
-  onGenerate: () => void;
-  onReset: () => void;
-  busy: boolean;
+  columns: number
+  setColumns: (c: number) => void
+  rows: number
+  setRows: (r: number) => void
+  marginColor: string
+  setMarginColor: (c: string) => void
+  onGenerate: () => void
+  onReset: () => void
+  busy: boolean
 }) {
   return (
     <aside className="flex h-fit flex-col gap-6 rounded-2xl border border-border bg-card p-5">
@@ -328,13 +326,13 @@ function Controls({
               type="button"
               onClick={() => setRows(r)}
               className={cn(
-                "flex items-center justify-center rounded-xl border px-2 py-3 text-sm font-medium transition-colors",
+                'flex items-center justify-center rounded-xl border px-2 py-3 text-sm font-medium transition-colors',
                 rows === r
-                  ? "border-primary bg-primary text-primary-foreground"
-                  : "border-border bg-background text-foreground hover:bg-accent",
+                  ? 'border-primary bg-primary text-primary-foreground'
+                  : 'border-border bg-background text-foreground hover:bg-accent',
               )}
             >
-              {r} {r === 1 ? "row" : "rows"}
+              {r} {r === 1 ? 'row' : 'rows'}
             </button>
           ))}
         </div>
@@ -351,10 +349,10 @@ function Controls({
               type="button"
               onClick={() => setColumns(c)}
               className={cn(
-                "flex items-center justify-center rounded-xl border px-2 py-3 text-sm font-medium transition-colors",
+                'flex items-center justify-center rounded-xl border px-2 py-3 text-sm font-medium transition-colors',
                 columns === c
-                  ? "border-primary bg-primary text-primary-foreground"
-                  : "border-border bg-background text-foreground hover:bg-accent",
+                  ? 'border-primary bg-primary text-primary-foreground'
+                  : 'border-border bg-background text-foreground hover:bg-accent',
               )}
             >
               {c} cols
@@ -364,12 +362,12 @@ function Controls({
       </div>
 
       <div className="rounded-xl border border-border bg-background px-4 py-3 text-sm">
-        <span className="text-muted-foreground">Layout</span>{" "}
+        <span className="text-muted-foreground">Layout</span>{' '}
         <span className="font-semibold text-foreground">
           {rows}×{columns}
-        </span>{" "}
+        </span>{' '}
         <span className="text-muted-foreground">
-          · {rows * columns} {rows * columns === 1 ? "post" : "posts"}
+          · {rows * columns} {rows * columns === 1 ? 'post' : 'posts'}
         </span>
       </div>
 
@@ -385,10 +383,10 @@ function Controls({
               onClick={() => setMarginColor(s.value)}
               aria-label={s.label}
               className={cn(
-                "size-9 rounded-full border shadow-sm transition-transform",
+                'size-9 rounded-full border shadow-sm transition-transform',
                 marginColor.toLowerCase() === s.value.toLowerCase()
-                  ? "border-primary ring-2 ring-primary ring-offset-2 ring-offset-card"
-                  : "border-border",
+                  ? 'border-primary ring-2 ring-primary ring-offset-2 ring-offset-card'
+                  : 'border-border',
               )}
               style={{ backgroundColor: s.value }}
             />
@@ -415,7 +413,7 @@ function Controls({
           size="lg"
           className="w-full"
         >
-          {busy ? "Generating…" : "Generate grid"}
+          {busy ? 'Generating…' : 'Generate grid'}
         </Button>
         <Button
           onClick={onReset}
@@ -427,7 +425,7 @@ function Controls({
         </Button>
       </div>
     </aside>
-  );
+  )
 }
 
 function Results({
@@ -437,13 +435,13 @@ function Results({
   onDownloadTile,
   onDownloadAll,
 }: {
-  tiles: GeneratedTile[];
-  columns: number;
-  rows: number;
-  onDownloadTile: (url: string, index: number) => void;
-  onDownloadAll: () => void;
+  tiles: GeneratedTile[]
+  columns: number
+  rows: number
+  onDownloadTile: (url: string, index: number) => void
+  onDownloadAll: () => void
 }) {
-  const total = rows * columns;
+  const total = rows * columns
   return (
     <section className="mt-12 flex flex-col gap-8">
       <div className="flex flex-col gap-4">
@@ -476,7 +474,7 @@ function Results({
                 src={tile.gridUrl}
                 alt={`Grid tile row ${tile.row + 1} column ${tile.col + 1}`}
                 className="min-w-0 object-cover"
-                style={{ aspectRatio: "3 / 4" }}
+                style={{ aspectRatio: '3 / 4' }}
               />
             ))}
           </div>
@@ -489,9 +487,9 @@ function Results({
           <h2 className="text-xl font-semibold text-foreground">
             Your 4:5 tiles to upload
           </h2>
-          <p className="max-w-2xl text-pretty text-sm text-muted-foreground">
-            Each file is 1080 × 1350 with side margins. Post them in{" "}
-            <span className="font-medium text-foreground">reverse order</span>{" "}
+          <p className="max-w-2xl text-sm text-pretty text-muted-foreground">
+            Each file is 1080 × 1350 with side margins. Post them in{' '}
+            <span className="font-medium text-foreground">reverse order</span>{' '}
             (tile {total} first, tile 1 last) so they land in reading order from
             left to right, top to bottom on your grid.
           </p>
@@ -508,12 +506,12 @@ function Results({
               <div className="relative overflow-hidden rounded-lg border border-border bg-card">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={tile.uploadUrl || "/placeholder.svg"}
+                  src={tile.uploadUrl || '/placeholder.svg'}
                   alt={`Upload tile ${i + 1}`}
                   className="w-full"
-                  style={{ aspectRatio: "4 / 5" }}
+                  style={{ aspectRatio: '4 / 5' }}
                 />
-                <span className="absolute left-2 top-2 flex size-6 items-center justify-center rounded-full bg-foreground/80 text-xs font-semibold text-background">
+                <span className="absolute top-2 left-2 flex size-6 items-center justify-center rounded-full bg-foreground/80 text-xs font-semibold text-background">
                   {i + 1}
                 </span>
               </div>
@@ -530,5 +528,5 @@ function Results({
         </div>
       </div>
     </section>
-  );
+  )
 }

@@ -5,7 +5,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "./ui/card";
+} from './ui/card'
 
 export function SpecCard({
   columns,
@@ -13,27 +13,27 @@ export function SpecCard({
   marginPx,
   marginPct,
 }: {
-  columns: number;
-  rows: number;
-  marginPx: number;
-  marginPct: number;
+  columns: number
+  rows: number
+  marginPx: number
+  marginPct: number
 }) {
   const specRows = [
-    { label: "Upload size (feed)", value: "1080 × 1350 px · 4:5" },
-    { label: "Grid crop (profile)", value: "1080 × 1440 px · 3:4" },
+    { label: 'Upload size (feed)', value: '1080 × 1350 px · 4:5' },
+    { label: 'Grid crop (profile)', value: '1080 × 1440 px · 3:4' },
     {
-      label: "Safe zone width",
+      label: 'Safe zone width',
       value: `1012.5 px (${(100 - marginPct * 2).toFixed(2)}%)`,
     },
     {
-      label: "Margin per side",
+      label: 'Margin per side',
       value: `${marginPx.toFixed(2)} px (${marginPct.toFixed(2)}%)`,
     },
     {
       label: `Full crop (${rows}×${columns})`,
       value: `${columns * 3}:${rows * 4} · ${rows * columns} tiles`,
     },
-  ];
+  ]
   return (
     <Card>
       <CardHeader>
@@ -68,5 +68,5 @@ export function SpecCard({
         </p>
       </CardFooter>
     </Card>
-  );
+  )
 }

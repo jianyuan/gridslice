@@ -1,4 +1,4 @@
-import { Sparkles } from "lucide-react";
+import { Sparkles } from 'lucide-react'
 
 export function Header() {
   return (
@@ -7,11 +7,11 @@ export function Header() {
         <span className="flex size-9 items-center justify-center rounded-xl bg-primary text-primary-foreground">
           <Sparkles className="size-5" />
         </span>
-        <span className="text-sm font-semibold uppercase tracking-widest">
+        <span className="text-sm font-semibold tracking-widest uppercase">
           GridSlice
         </span>
       </div>
-      <h1 className="text-balance text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+      <h1 className="text-3xl font-bold tracking-tight text-balance text-foreground sm:text-4xl">
         Instagram grid layout maker
       </h1>
       <p className="max-w-2xl text-pretty text-muted-foreground">
@@ -20,5 +20,5 @@ export function Header() {
         grid crop, while every download stays a clean 4:5 for the feed.
       </p>
     </header>
-  );
+  )
 }

@@ -1,5 +1,5 @@
-import { GridMaker } from "@/components/grid-maker";
-import { Header } from "@/components/header";
+import { GridMaker } from '@/components/grid-maker'
+import { Header } from '@/components/header'
 
 export default function Home() {
   return (
@@ -7,5 +7,5 @@ export default function Home() {
       <Header />
       <GridMaker />
     </div>
-  );
+  )
 }
