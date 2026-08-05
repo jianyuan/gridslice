@@ -40,6 +40,10 @@ export function GridMaker() {
 
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
+  const [cropSize, setCropSize] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
   const [pixelCrop, setPixelCrop] = useState<PixelCrop | null>(null);
 
   const [tiles, setTiles] = useState<GeneratedTile[] | null>(null);
@@ -189,34 +193,40 @@ export function GridMaker() {
                 minZoom={1}
                 maxZoom={4}
                 restrictPosition
-                showGrid
+                showGrid={false}
                 onCropChange={setCrop}
                 onZoomChange={setZoom}
+                onCropSizeChange={setCropSize}
                 onCropComplete={handleCropComplete}
                 objectFit="contain"
               />
 
-              {/* Column split guides */}
-              <div className="pointer-events-none absolute inset-0 flex">
-                {Array.from({ length: columns - 1 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="h-full border-r border-white/40"
-                    style={{ width: `${100 / columns}%` }}
-                  />
-                ))}
-              </div>
-
-              {/* Row split guides */}
-              <div className="pointer-events-none absolute inset-0 flex flex-col">
-                {Array.from({ length: rows - 1 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="w-full border-b border-white/40"
-                    style={{ height: `${100 / rows}%` }}
-                  />
-                ))}
-              </div>
+              {/* Split guides */}
+              {cropSize && (
+                <div
+                  className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+                  style={{ width: cropSize.width, height: cropSize.height }}
+                >
+                  <div className="absolute inset-0 flex">
+                    {Array.from({ length: columns - 1 }).map((_, i) => (
+                      <div
+                        key={i}
+                        className="h-full border-r border-white/60"
+                        style={{ width: `${100 / columns}%` }}
+                      />
+                    ))}
+                  </div>
+                  <div className="absolute inset-0 flex">
+                    {Array.from({ length: rows - 1 }).map((_, i) => (
+                      <div
+                        key={i}
+                        className="w-full border-b border-white/60"
+                        style={{ height: `${100 / rows}%` }}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="flex items-center gap-3">
