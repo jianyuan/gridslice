@@ -24,7 +24,7 @@ jobs:
       - uses: pnpm/setup@v2
         with:
           cache: true
-      - uses: actions/configure-pages@v5
+      - uses: actions/configure-pages@v6
         with:
           static_site_generator: next
       - run: pnpm build
