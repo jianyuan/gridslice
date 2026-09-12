@@ -1,11 +1,15 @@
+import { Footer } from '@/components/footer'
 import { GridMaker } from '@/components/grid-maker'
 import { Header } from '@/components/header'
 
 export default function Home() {
   return (
-    <div className="flex flex-col gap-8 p-4 sm:p-8">
+    <div className="min-h-screen">
       <Header />
-      <GridMaker />
+      <main className="mx-auto max-w-5xl px-4 sm:px-6 py-8">
+        <GridMaker />
+      </main>
+      <Footer />
     </div>
   )
 }

@@ -2,7 +2,7 @@ import { Sparkles } from 'lucide-react'
 
 export function Header() {
   return (
-    <header className="flex flex-col gap-3">
+    <header className="mx-auto max-w-5xl flex flex-col gap-3 px-4 sm:px-6 py-6">
       <div className="flex items-center gap-2 text-primary">
         <span className="flex size-9 items-center justify-center rounded-xl bg-primary text-primary-foreground">
           <Sparkles className="size-5" />
